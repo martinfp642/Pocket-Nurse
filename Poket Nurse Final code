@@ -1,0 +1,47 @@
+
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(12, 11, 10, 9, 8, 7);
+float voltaje;
+void setup ()
+
+{
+  lcd.begin(16,2);
+  lcd.print("Corporal Temp:");
+  Serial.begin(9600); //Iniciamos la comunicación con el puerto serial
+  
+}
+
+void loop() {
+   float grados;
+   float pulsostot=0;
+   int pulso[1000];
+   int i;
+   
+   voltaje = analogRead(5) * 0.004882814;                         
+  grados = (voltaje - 0.5) * 100.0;
+  lcd.setCursor(0, 1);
+ 
+for (i = 0;((millis()/1000)= 10); i = i + 1) {
+  pulso[i] = analogRead(3);   
+  pulsostot= pulsostot + pulso[i];
+}
+  pulsos = pulsostot/i;
+  
+if (analogRead(4)==1023){
+ 
+  // print the number of seconds since reset:
+  lcd.print(grados);
+  lcd.print("C Time:");
+  lcd.print(millis()/1000);
+  lcd.print("s");
+} else {
+ 
+  lcd.print(pulsos);
+  lcd.print("bpm Time:");
+  lcd.print(millis()/1000);
+  lcd.print("s");
+  
+  
+  }
+}
