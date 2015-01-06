@@ -1,47 +1,75 @@
 
 #include <LiquidCrystal.h>
+#include <SD.h>
 
-LiquidCrystal lcd(12, 11, 10, 9, 8, 7);
+LiquidCrystal lcd(5, 3, 6, 9, 8, 7);
+
+const int chipSelect = 4;
+
+
 float voltaje;
+float grados;
+float pulsostot;
+int i=0;
+int pulsos;
+int cont = 1;
+int pulsoini[1000];
+
 void setup ()
 
 {
   lcd.begin(16,2);
-  lcd.print("Corporal Temp:");
+  pinMode(10, OUTPUT);
   Serial.begin(9600); //Iniciamos la comunicación con el puerto serial
   
+  if (!SD.begin(chipSelect)){
+    lcd.print("Error reading SD.");
+    return;
+  }
 }
 
 void loop() {
-   float grados;
-   float pulsostot=0;
-   int pulso[1000];
-   int i;
-   
-   voltaje = analogRead(5) * 0.004882814;                         
+  
+File dataFile = SD.open("PocketNurse.txt", FILE_WRITE);  
+
+  voltaje = analogRead(5) * 0.004882814;                         
   grados = (voltaje - 0.5) * 100.0;
-  lcd.setCursor(0, 1);
- 
-for (i = 0;((millis()/1000)= 10); i = i + 1) {
-  pulso[i] = analogRead(3);   
-  pulsostot= pulsostot + pulso[i];
-}
-  pulsos = pulsostot/i;
-  
-if (analogRead(4)==1023){
- 
-  // print the number of seconds since reset:
+  lcd.setCursor(0,0);
+  lcd.print("Body Temp:");
   lcd.print(grados);
-  lcd.print("C Time:");
-  lcd.print(millis()/1000);
-  lcd.print("s");
-} else {
- 
-  lcd.print(pulsos);
-  lcd.print("bpm Time:");
-  lcd.print(millis()/1000);
-  lcd.print("s");
-  
-  
+  lcd.print("C");
+
+
+  //pulsoini[cont]=analogRead(3);
+  pulsostot= i;
+  cont++;
+  lcd.setCursor(0,1);
+  lcd.print("Pulse:");
+  lcd.print(pulsostot);
+  lcd.print("bpm");  
+  delay(500);
+  // if (pulsoini[cont] != pulsoini[cont--]){
+  //i++;
+  //}
+
+
+ if (dataFile) {
+    // Escribimos en el fichero "POT: "
+    dataFile.print("Temp: ");
+    // A continuacion escribimos el valor de la variable pot y saltamos a la linea siguiente.
+    dataFile.println(grados);
+    dataFile.println("-----0.5s-----");
+    // Cerramos el archivo.
+    dataFile.close();
+   
+    // Avisamos de que se ha podido escribir correctamente.
+    lcd.setCursor(1,14);
+    lcd.print(":)");
+   
+  // Si no pudimos escribir en el fichero avisamos por el puerto serie.
+  }else{
+    lcd.setCursor(1,14);
+    lcd.print(":(");
   }
+  
 }
